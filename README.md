@@ -2,7 +2,7 @@
 
 Shell script that deploys, runs, and archives logs for a Student Attendance Tracker. The tracker is a small Python program. This repository does not change how that program works. `deploy_agent.sh` builds the directory layout the program expects, can adjust its alert thresholds, runs a live marking session, and stores the session logs.
 
-**Run-through video:** _record the walkthrough described at the bottom of this file, upload it, and replace this sentence with the URL before you submit._
+**Run-through video:** _link goes here_
 
 ## What is in the repository
 
@@ -187,17 +187,3 @@ These checks were run against this script on macOS with Python 3.14 and `/usr/bi
 - **Ctrl+C before the folder exists.** An existing project was left in place and no zip was written.
 - **Ctrl+C and Ctrl+Z at the threshold question.** Each signal wrote `attendance_tracker_<suffix>_archive.zip`, `unzip -t` passed, the listing contained the checker, `Helpers/assets.csv`, `Helpers/config.json`, and `reports/`, and the incomplete directory was gone.
 - **Ctrl+C on the first marking prompt.** The program printed that the roster was not changed, no interrupt zip was created, and the project directory remained.
-
-## What the video should show
-
-Record one pass, about five to eight minutes, with the terminal text large enough to read. Talk through the logic while you do it. Use a suffix such as `v1`.
-
-1. Show the repository: `deploy_agent.sh`, `templates/`, and this README. Say that the script is the automation, and the Python file is only copied.
-2. Start `./deploy_agent.sh`, choose **1**, suffix `v1`, roster **A**, and copy all **10** students. Say why `total_sessions` stays 5: each sample row already has 4 prior sessions, and today is the fifth.
-3. Say yes to the threshold update. Try a bad value such as `abc`, then set warning to `80` and failure to `40`. Point at the `sed` lines and at `chmod 600` in the permission listing.
-4. When the checker starts, mark a few students present and absent so the screen shows OK, WARNING, and FAILURE. Quit the menu.
-5. Run the script again, choose **3**, and show the two timestamped files under `archives/attendance/` and `archives/absent/`.
-6. Start another deploy, suffix `cut`. Answer until you see `Update the alert thresholds?`, then press **Ctrl+C**. Show the message, run `unzip -l attendance_tracker_cut_archive.zip`, and show that `attendance_tracker_cut/` is gone.
-7. Repeat once with **Ctrl+Z** on a different suffix, for example `stop`.
-
-Paste the uploaded URL into the video line at the top of this file.
