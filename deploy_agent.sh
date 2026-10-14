@@ -82,6 +82,13 @@ With no argument, an interactive menu is shown.
              archives/attendance/ and archives/absent/ with a timestamp
   help       Show this message
 
+The project folder is attendance_tracker_<suffix>/ in the current directory.
+Suffix v1 creates attendance_tracker_v1/.
+
+Ctrl+C or Ctrl+Z during deploy packs that folder into
+attendance_tracker_<suffix>_archive.zip and then removes the folder.
+That trap is not active while a marking session is running.
+
 Run this script from the directory where the project folder should be created.
 Templates are read from ${TEMPLATE_DIR}.
 EOF

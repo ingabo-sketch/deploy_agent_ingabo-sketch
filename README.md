@@ -40,6 +40,8 @@ chmod +x deploy_agent.sh
 ./deploy_agent.sh
 ```
 
+`./deploy_agent.sh help` prints the same choices without opening the menu.
+
 ## How to select a feature
 
 With no arguments the script opens a menu:
