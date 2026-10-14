@@ -2,7 +2,7 @@
 
 Shell script that deploys, runs, and archives logs for a Student Attendance Tracker. The tracker is a small Python program. This repository does not change how that program works. `deploy_agent.sh` builds the directory layout the program expects, can adjust its alert thresholds, runs a live marking session, and stores the session logs.
 
-**Run-through video:** _link goes here_
+**Run-through video:** https://www.loom.com/share/dfd9073f4eb1475a83ec907fc0e50794
 
 ## What is in the repository
 
