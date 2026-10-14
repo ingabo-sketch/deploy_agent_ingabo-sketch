@@ -1,4 +1,6 @@
 .DS_Store
+*.swp
+*~
 attendance_tracker_*/
 *_archive.zip
 __pycache__/
