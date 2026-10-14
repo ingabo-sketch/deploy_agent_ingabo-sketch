@@ -1,0 +1,5 @@
+.DS_Store
+attendance_tracker_*/
+*_archive.zip
+__pycache__/
+*.pyc
