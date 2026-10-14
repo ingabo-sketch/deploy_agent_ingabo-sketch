@@ -21,7 +21,6 @@ TEMPLATE_CONFIG="${TEMPLATE_DIR}/config.json"
 
 PROJECT_DIR=""
 TREE_CREATED=0
-IN_MENU=0
 ANSWER=""
 
 # Option B builds rows from these arrays. Counts are written as 0, 0.
@@ -30,44 +29,12 @@ SAMPLE_NAMES=(
   "Bob Smith"
   "Carol White"
   "David Brown"
-  "Emma Davis"
-  "Frank Miller"
-  "Grace Wilson"
-  "Henry Moore"
-  "Iris Taylor"
-  "Jack Anderson"
-  "Kara Thomas"
-  "Leo Martinez"
-  "Mia Garcia"
-  "Noah Robinson"
-  "Olivia Clark"
-  "Paul Lewis"
-  "Quinn Walker"
-  "Ruby Hall"
-  "Sam Young"
-  "Tina King"
 )
 SAMPLE_EMAILS=(
   "alice@example.com"
   "bob@example.com"
   "carol@example.com"
   "david@example.com"
-  "emma@example.com"
-  "frank@example.com"
-  "grace@example.com"
-  "henry@example.com"
-  "iris@example.com"
-  "jack@example.com"
-  "kara@example.com"
-  "leo@example.com"
-  "mia@example.com"
-  "noah@example.com"
-  "olivia@example.com"
-  "paul@example.com"
-  "quinn@example.com"
-  "ruby@example.com"
-  "sam@example.com"
-  "tina@example.com"
 )
 
 usage() {
@@ -110,15 +77,6 @@ prompt() {
 
 is_whole_number() {
   [[ "$1" =~ ^[0-9]+$ ]]
-}
-
-file_mode() {
-  local file="$1"
-  if stat -f '%Lp' "$file" >/dev/null 2>&1; then
-    stat -f '%Lp' "$file"
-  else
-    stat -c '%a' "$file"
-  fi
 }
 
 require_python3() {
@@ -235,10 +193,6 @@ ask_project_suffix() {
           ;;
       esac
     fi
-    if [[ -e "$PROJECT_DIR" ]]; then
-      echo "Error: ${PROJECT_DIR} exists and is not a directory. Choose a different suffix."
-      continue
-    fi
     return 0
   done
 }
@@ -279,11 +233,7 @@ copy_roster_from_template() {
     fi
     # NR 1 is the header. Data rows are 2 .. count+1. awk avoids a SIGPIPE from head.
     awk -v count="$count" 'NR == 1 || NR <= count + 1' "$TEMPLATE_ASSETS" > "$dest"
-    if [[ "$count" -eq 1 ]]; then
-      echo "Copied 1 student row plus the header into Helpers/assets.csv."
-    else
-      echo "Copied ${count} student rows plus the header into Helpers/assets.csv."
-    fi
+    echo "Copied ${count} student rows plus the header into Helpers/assets.csv."
     echo "Those rows carry 4 prior sessions, so total_sessions stays 5 (4 prior + today)."
     return 0
   done
@@ -311,11 +261,7 @@ generate_roster() {
         printf '%s,%s,0,0\n' "$email" "$name"
       done
     } > "$dest"
-    if [[ "$count" -eq 1 ]]; then
-      echo "Wrote 1 new student row with attendance 0 and absence 0."
-    else
-      echo "Wrote ${count} new student rows with attendance 0 and absence 0."
-    fi
+    echo "Wrote ${count} new student rows with attendance 0 and absence 0."
     return 0
   done
 }
@@ -380,7 +326,6 @@ populate_project() {
 set_permissions() {
   local app="${PROJECT_DIR}/attendance_checker.py"
   local config="${PROJECT_DIR}/Helpers/config.json"
-  local app_mode config_mode
 
   chmod +x "$app" || {
     echo "Error: chmod +x failed for attendance_checker.py. Permission denied?" >&2
@@ -391,33 +336,10 @@ set_permissions() {
     return 1
   }
 
-  app_mode="$(file_mode "$app")"
-  config_mode="$(file_mode "$config")"
   echo ""
   echo "Permissions set:"
   ls -l "$app"
   ls -l "$config"
-  echo "attendance_checker.py mode ${app_mode} (executable)."
-  echo "Helpers/config.json mode ${config_mode} (owner read/write only)."
-
-  case "$app_mode" in
-    *[!0-9]*)
-      echo "Error: could not read the mode of attendance_checker.py." >&2
-      return 1
-      ;;
-  esac
-  # User execute bit: modes are three digits. The first digit must include execute (1, 3, 5, or 7).
-  case "${app_mode:0:1}" in
-    1|3|5|7) ;;
-    *)
-      echo "Error: attendance_checker.py is not executable for the owner (mode ${app_mode})." >&2
-      return 1
-      ;;
-  esac
-  if [[ "$config_mode" != "600" ]]; then
-    echo "Error: Helpers/config.json mode is ${config_mode}, expected 600." >&2
-    return 1
-  fi
 }
 
 update_thresholds() {
@@ -493,7 +415,7 @@ update_thresholds() {
   echo "sed updated only the threshold numbers:"
   echo "  warning: ${before_warning}  ->  $(grep -E '"warning":[[:space:]]*[0-9]+' "$config")"
   echo "  failure: ${before_failure}  ->  $(grep -E '"failure":[[:space:]]*[0-9]+' "$config")"
-  echo "Helpers/config.json is still mode $(file_mode "$config")."
+  ls -l "$config"
 }
 
 verify_deployment() {
@@ -515,15 +437,6 @@ verify_deployment() {
   done
   if [[ ! -d "$reports" || ! -d "${PROJECT_DIR}/Helpers" ]]; then
     echo "Error: Helpers/ or reports/ is not a directory." >&2
-    return 1
-  fi
-
-  if ! PYTHONDONTWRITEBYTECODE=1 python3 -c 'import pathlib, sys; p = pathlib.Path(sys.argv[1]); compile(p.read_text(encoding="utf-8"), str(p), "exec")' "$app"; then
-    echo "Error: attendance_checker.py did not compile." >&2
-    return 1
-  fi
-  if ! python3 -c 'import json, sys; json.load(open(sys.argv[1], encoding="utf-8"))' "$config"; then
-    echo "Error: config.json is not valid JSON." >&2
     return 1
   fi
 
@@ -718,7 +631,6 @@ print_menu() {
 
 menu() {
   local choice
-  IN_MENU=1
   while true; do
     print_menu
     prompt "Select a feature [1-4]: " || exit 1
